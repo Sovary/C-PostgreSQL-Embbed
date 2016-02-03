@@ -1,0 +1,61 @@
+#include <common.h>
+
+/*---------------------------------------------------------------------------*/
+int dbms_connect()
+/*---------------------------------------------------------------------------*/
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+        char username[20];
+        char password[20];
+        char pgdbhost [128];
+    EXEC SQL END   DECLARE SECTION;
+    memset(username, 0x00, sizeof(username));
+    memset(password, 0x00, sizeof(password));
+    memset(pgdbhost, 0x00, sizeof(pgdbhost));
+
+    strcpy(username, USERNAME);
+    strcpy(password, PASSWORD);
+    strcpy(pgdbhost, PGDBHOST);
+
+    EXEC SQL CONNECT TO :pgdbhost AS conn2 USER :username/:password;
+
+    if ( SQLCODE ) {
+        printf("<%s:%d> [%d][%s]\n", PGM, LIN, SQLCODE, SQLERRM);
+        return D_NK;
+    }
+    printf("<%s:%d> DB Connect Success!\n", PGM, LIN);
+    return (D_OK);
+}
+/*---------------------------------------------------------------------------*/
+int dbms_disconnect()
+/*---------------------------------------------------------------------------*/
+{
+/*
+    EXEC SQL COMMIT;
+    EXEC SQL CONNECT RESET;
+*/
+    EXEC SQL DISCONNECT ALL;
+    printf("<%s:%d> DB disconnect!\n", PGM, LIN);
+}
+/*---------------------------------------------------------------------------*/
+int dbms_rollback()
+/*---------------------------------------------------------------------------*/
+{
+    EXEC SQL ROLLBACK;
+    if ( SQLCODE ) {
+        printf("<%s:%d> SQLERR(%d):%s\n", PGM, LIN, SQLCODE, SQLERRM);
+    }
+    return (SQLCODE);
+}
+/*---------------------------------------------------------------------------*/
+int dbms_commit()
+/*---------------------------------------------------------------------------*/
+{
+    EXEC SQL COMMIT WORK;
+    if ( SQLCODE ) {
+        printf("<%s:%d> SQLERR(%d):%s\n", PGM, LIN, SQLCODE, SQLERRM);
+    }
+    return (SQLCODE);
+}
+/*---------------------------- E N D  O F  F I L E -------------------------*/
+
